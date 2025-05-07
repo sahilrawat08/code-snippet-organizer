@@ -4,15 +4,31 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class CodeSnippetOrganizer {
     private static SnippetManager manager;
     private static Scanner scanner;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    
+    // ANSI color codes
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_CYAN = "\u001B[36m";
+    private static final String ANSI_BOLD = "\u001B[1m";
 
     public static void main(String[] args) {
         manager = new SnippetManager();
         scanner = new Scanner(System.in);
+        
+        // Display welcome message
+        displayWelcomeMessage();
         
         while (true) {
             try {
@@ -48,57 +64,69 @@ public class CodeSnippetOrganizer {
                         importSnippets();
                         break;
                     case 10:
-                        System.out.println("Goodbye!");
+                        System.out.println(ANSI_GREEN + "\nThank you for using Code Snippet Organizer!" + ANSI_RESET);
                         return;
                     default:
-                        System.out.println("Invalid choice. Please try again.");
+                        System.out.println(ANSI_RED + "Invalid choice. Please try again." + ANSI_RESET);
                 }
             } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(ANSI_RED + "Error: " + e.getMessage() + ANSI_RESET);
                 System.out.println("Please try again.");
             }
         }
     }
 
+    private static void displayWelcomeMessage() {
+        System.out.println(ANSI_CYAN + 
+            "╔══════════════════════════════════════════════════════════╗\n" +
+            "║                                                          ║\n" +
+            "║              Welcome to Code Snippet Organizer!          ║\n" +
+            "║                                                          ║\n" +
+            "║     Your personal code snippet management assistant      ║\n" +
+            "║                                                          ║\n" +
+            "╚══════════════════════════════════════════════════════════╝" + 
+            ANSI_RESET);
+    }
+
     private static void displayMenu() {
-        System.out.println("\n=== Code Snippet Organizer ===");
-        System.out.println("1. Add new snippet");
-        System.out.println("2. Search snippets");
-        System.out.println("3. Edit snippet");
-        System.out.println("4. Delete snippet");
-        System.out.println("5. List all snippets");
-        System.out.println("6. Undo last operation");
-        System.out.println("7. Redo last operation");
-        System.out.println("8. Export snippets");
-        System.out.println("9. Import snippets");
-        System.out.println("10. Exit");
+        System.out.println(ANSI_CYAN + "\n=== " + ANSI_BOLD + "Code Snippet Organizer" + ANSI_RESET + ANSI_CYAN + " ===" + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "1. " + ANSI_RESET + "Add new snippet");
+        System.out.println(ANSI_YELLOW + "2. " + ANSI_RESET + "Search snippets");
+        System.out.println(ANSI_YELLOW + "3. " + ANSI_RESET + "Edit snippet");
+        System.out.println(ANSI_YELLOW + "4. " + ANSI_RESET + "Delete snippet");
+        System.out.println(ANSI_YELLOW + "5. " + ANSI_RESET + "List all snippets");
+        System.out.println(ANSI_YELLOW + "6. " + ANSI_RESET + "Undo last operation");
+        System.out.println(ANSI_YELLOW + "7. " + ANSI_RESET + "Redo last operation");
+        System.out.println(ANSI_YELLOW + "8. " + ANSI_RESET + "Export snippets");
+        System.out.println(ANSI_YELLOW + "9. " + ANSI_RESET + "Import snippets");
+        System.out.println(ANSI_YELLOW + "10. " + ANSI_RESET + "Exit");
     }
 
     private static void addSnippet() {
-        System.out.println("\n=== Add New Snippet ===");
+        System.out.println(ANSI_CYAN + "\n=== " + ANSI_BOLD + "Add New Snippet" + ANSI_RESET + ANSI_CYAN + " ===" + ANSI_RESET);
         
         // Get title with validation
         String title;
         while (true) {
-            title = getStringInput("Enter snippet title: ").trim();
+            title = getStringInput(ANSI_YELLOW + "📝 Enter snippet title: " + ANSI_RESET).trim();
             if (!title.isEmpty()) {
                 break;
             }
-            System.out.println("Title cannot be empty. Please try again.");
+            System.out.println(ANSI_RED + "Title cannot be empty. Please try again." + ANSI_RESET);
         }
 
         // Get language with validation
         String language;
         while (true) {
-            language = getStringInput("Enter programming language: ").trim();
+            language = getStringInput(ANSI_YELLOW + "💻 Enter programming language: " + ANSI_RESET).trim();
             if (!language.isEmpty()) {
                 break;
             }
-            System.out.println("Language cannot be empty. Please try again.");
+            System.out.println(ANSI_RED + "Language cannot be empty. Please try again." + ANSI_RESET);
         }
 
         // Get code with validation
-        System.out.println("Enter code (type 'END' on a new line to finish):");
+        System.out.println(ANSI_CYAN + "\n📝 Enter code (type 'END' on a new line to finish):" + ANSI_RESET);
         StringBuilder code = new StringBuilder();
         String line;
         boolean hasContent = false;
@@ -111,7 +139,7 @@ public class CodeSnippetOrganizer {
         }
 
         if (!hasContent) {
-            System.out.println("Code cannot be empty. Please try again.");
+            System.out.println(ANSI_RED + "Code cannot be empty. Please try again." + ANSI_RESET);
             return;
         }
 
@@ -119,94 +147,87 @@ public class CodeSnippetOrganizer {
         List<String> tags = new ArrayList<>();
         
         // Add tags
-        System.out.println("\nWould you like to add tags? (yes/no)");
+        System.out.println(ANSI_CYAN + "\n🏷️  Would you like to add tags? (yes/no)" + ANSI_RESET);
         String addTags = getStringInput("Enter your choice: ").toLowerCase();
         
         if (addTags.equals("yes") || addTags.equals("y")) {
+            System.out.println(ANSI_CYAN + "\nEnter tags (one per line, type 'DONE' to finish):" + ANSI_RESET);
             while (true) {
-                System.out.println("\nCurrent tags: " + String.join(", ", tags));
-                System.out.println("1. Add a tag");
-                System.out.println("2. Remove a tag");
-                System.out.println("3. Finish adding tags");
-                
-                int tagChoice = getIntInput("Enter your choice: ");
-                
-                switch (tagChoice) {
-                    case 1:
-                        String newTag = getStringInput("Enter tag to add: ").trim();
-                        if (!newTag.isEmpty()) {
-                            tags.add(newTag);
-                            System.out.println("Tag added successfully!");
-                        } else {
-                            System.out.println("Tag cannot be empty!");
-                        }
-                        break;
-                    case 2:
-                        if (!tags.isEmpty()) {
-                            String tagToRemove = getStringInput("Enter tag to remove: ").trim();
-                            if (tags.contains(tagToRemove)) {
-                                tags.remove(tagToRemove);
-                                System.out.println("Tag removed successfully!");
-                            } else {
-                                System.out.println("Tag not found!");
-                            }
-                        } else {
-                            System.out.println("No tags to remove!");
-                        }
-                        break;
-                    case 3:
-                        System.out.println("Finished adding tags.");
-                        break;
-                    default:
-                        System.out.println("Invalid choice!");
-                        continue;
-                }
-                
-                if (tagChoice == 3) {
+                String tag = getStringInput(ANSI_YELLOW + "Tag: " + ANSI_RESET).trim();
+                if (tag.equals("DONE")) {
                     break;
+                }
+                if (!tag.isEmpty()) {
+                    tags.add(tag);
                 }
             }
         }
 
         // Confirm before adding
-        System.out.println("\nPlease review your snippet:");
-        System.out.println("Title: " + title);
-        System.out.println("Language: " + language);
-        System.out.println("Tags: " + String.join(", ", tags));
-        System.out.println("Code:\n" + code);
+        System.out.println(ANSI_CYAN + "\n📋 Please review your snippet:" + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "Title: " + ANSI_RESET + title);
+        System.out.println(ANSI_YELLOW + "Language: " + ANSI_RESET + language);
+        System.out.println(ANSI_YELLOW + "Tags: " + ANSI_RESET + String.join(", ", tags));
+        System.out.println(ANSI_YELLOW + "Code:\n" + ANSI_RESET + code);
         
-        System.out.println("\nDo you want to save this snippet? (yes/no)");
+        System.out.println(ANSI_CYAN + "\n💾 Do you want to save this snippet? (yes/no)" + ANSI_RESET);
         String confirm = getStringInput("Enter your choice: ").toLowerCase();
         
         if (confirm.equals("yes") || confirm.equals("y")) {
             try {
+                // Show saving animation
+                System.out.print(ANSI_CYAN + "\n💾 Saving");
+                for (int i = 0; i < 3; i++) {
+                    try {
+                        Thread.sleep(300);
+                        System.out.print(".");
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                System.out.println(ANSI_RESET);
+                
                 manager.addSnippet(title, language, code.toString(), tags);
-                System.out.println("Snippet added successfully!");
+                System.out.println(ANSI_GREEN + "\n✨ Snippet added successfully!" + ANSI_RESET);
             } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(ANSI_RED + "Error: " + e.getMessage() + ANSI_RESET);
             }
         } else {
-            System.out.println("Snippet creation cancelled.");
+            System.out.println(ANSI_YELLOW + "\nSnippet creation cancelled." + ANSI_RESET);
         }
     }
 
     private static void searchSnippets() {
-        System.out.println("\n=== Search Snippets ===");
-        System.out.println("1. Search by title");
-        System.out.println("2. Search by tag");
-        System.out.println("3. Search by keyword");
-        System.out.println("4. Search by language");
-        System.out.println("5. Search by content");
-        System.out.println("6. Search by date range");
-        System.out.println("7. Advanced search (searches everywhere)");
+        System.out.println(ANSI_CYAN + "\n=== " + ANSI_BOLD + "Search Snippets" + ANSI_RESET + ANSI_CYAN + " ===" + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "1. " + ANSI_RESET + "Search by title");
+        System.out.println(ANSI_YELLOW + "2. " + ANSI_RESET + "Search by tag");
+        System.out.println(ANSI_YELLOW + "3. " + ANSI_RESET + "Search by keyword");
+        System.out.println(ANSI_YELLOW + "4. " + ANSI_RESET + "Search by language");
+        System.out.println(ANSI_YELLOW + "5. " + ANSI_RESET + "Search by content");
+        System.out.println(ANSI_YELLOW + "6. " + ANSI_RESET + "Search by date range");
+        System.out.println(ANSI_YELLOW + "7. " + ANSI_RESET + "Advanced search (searches everywhere)");
         
         int choice = getIntInput("Enter your choice: ");
         String query = getStringInput("Enter search query: ").trim();
         
         if (query.isEmpty()) {
-            System.out.println("Search query cannot be empty.");
+            System.out.println(ANSI_RED + "Search query cannot be empty." + ANSI_RESET);
             return;
         }
+        
+        // Show searching animation
+        System.out.print(ANSI_CYAN + "\n🔍 Searching");
+        for (int i = 0; i < 3; i++) {
+            try {
+                Thread.sleep(300);
+                System.out.print(".");
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.println(ANSI_RESET);
         
         List<Snippet> results;
         try {
@@ -220,11 +241,12 @@ public class CodeSnippetOrganizer {
                 case 3:
                     List<String> keywords = manager.searchKeywords(query);
                     if (!keywords.isEmpty()) {
-                        System.out.println("Suggested keywords: " + String.join(", ", keywords));
-                        System.out.println("\nSnippets containing these keywords:");
+                        System.out.println(ANSI_GREEN + "\n✨ Suggested keywords: " + ANSI_RESET + 
+                            String.join(", ", keywords));
+                        System.out.println(ANSI_CYAN + "\n📚 Snippets containing these keywords:" + ANSI_RESET);
                         results = manager.advancedSearch(query);
                     } else {
-                        System.out.println("No matching keywords found.");
+                        System.out.println(ANSI_YELLOW + "\nNo matching keywords found." + ANSI_RESET);
                         return;
                     }
                     break;
@@ -235,7 +257,7 @@ public class CodeSnippetOrganizer {
                     results = manager.searchByContent(query);
                     break;
                 case 6:
-                    System.out.println("Enter date range (format: yyyy-MM-dd HH:mm)");
+                    System.out.println(ANSI_CYAN + "\nEnter date range (format: yyyy-MM-dd HH:mm)" + ANSI_RESET);
                     String startDate = getStringInput("Start date: ");
                     String endDate = getStringInput("End date: ");
                     try {
@@ -243,7 +265,7 @@ public class CodeSnippetOrganizer {
                         LocalDateTime end = LocalDateTime.parse(endDate, DATE_FORMATTER);
                         results = manager.searchByDate(start, end);
                     } catch (DateTimeParseException e) {
-                        System.out.println("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                        System.out.println(ANSI_RED + "Invalid date format. Please use yyyy-MM-dd HH:mm" + ANSI_RESET);
                         return;
                     }
                     break;
@@ -251,21 +273,47 @@ public class CodeSnippetOrganizer {
                     results = manager.advancedSearch(query);
                     break;
                 default:
-                    System.out.println("Invalid choice.");
+                    System.out.println(ANSI_RED + "Invalid choice." + ANSI_RESET);
                     return;
             }
             
-            displayResults(results);
-            
             if (results.isEmpty()) {
-                System.out.println("\nNo snippets found matching your search criteria.");
-                System.out.println("Suggestions:");
+                System.out.println(ANSI_YELLOW + "\nNo snippets found matching your search criteria." + ANSI_RESET);
+                System.out.println(ANSI_CYAN + "\nSuggestions:" + ANSI_RESET);
                 System.out.println("1. Try using different keywords");
                 System.out.println("2. Use the advanced search option");
                 System.out.println("3. Check for typos in your search query");
+                return;
             }
+            
+            // Group results by language
+            Map<String, List<Snippet>> resultsByLanguage = results.stream()
+                .collect(Collectors.groupingBy(Snippet::getLanguage));
+            
+            System.out.println(ANSI_GREEN + "\n✨ Found " + results.size() + " matching snippet(s):" + ANSI_RESET);
+            
+            // Display results grouped by language
+            for (Map.Entry<String, List<Snippet>> entry : resultsByLanguage.entrySet()) {
+                String language = entry.getKey();
+                List<Snippet> languageSnippets = entry.getValue();
+                
+                System.out.println(ANSI_GREEN + "\n📚 " + ANSI_BOLD + language.toUpperCase() + ANSI_RESET + 
+                                 ANSI_GREEN + " (" + languageSnippets.size() + " snippets)" + ANSI_RESET);
+                System.out.println(ANSI_CYAN + "═".repeat(50) + ANSI_RESET);
+                
+                for (Snippet snippet : languageSnippets) {
+                    System.out.println(ANSI_YELLOW + "\n📝 " + ANSI_BOLD + snippet.getTitle() + ANSI_RESET);
+                    System.out.println(ANSI_PURPLE + "   Tags: " + ANSI_RESET + String.join(", ", snippet.getTags()));
+                    System.out.println(ANSI_BLUE + "   Created: " + ANSI_RESET + 
+                        snippet.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                    System.out.println(ANSI_BLUE + "   Last Updated: " + ANSI_RESET + 
+                        snippet.getLastModified().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                    System.out.println(ANSI_CYAN + "   " + "─".repeat(40) + ANSI_RESET);
+                }
+            }
+            
         } catch (Exception e) {
-            System.out.println("Error during search: " + e.getMessage());
+            System.out.println(ANSI_RED + "Error during search: " + e.getMessage() + ANSI_RESET);
         }
     }
 
@@ -410,9 +458,37 @@ public class CodeSnippetOrganizer {
     }
 
     private static void listAllSnippets() {
-        System.out.println("\n=== All Snippets ===");
+        System.out.println(ANSI_CYAN + "\n=== " + ANSI_BOLD + "All Snippets" + ANSI_RESET + ANSI_CYAN + " ===" + ANSI_RESET);
         List<Snippet> snippets = manager.getAllSnippets();
-        displayResults(snippets);
+        
+        if (snippets.isEmpty()) {
+            System.out.println(ANSI_YELLOW + "\nNo snippets found. Add some snippets to get started!" + ANSI_RESET);
+            return;
+        }
+
+        // Group snippets by language
+        Map<String, List<Snippet>> snippetsByLanguage = snippets.stream()
+            .collect(Collectors.groupingBy(Snippet::getLanguage));
+
+        // Display snippets grouped by language
+        for (Map.Entry<String, List<Snippet>> entry : snippetsByLanguage.entrySet()) {
+            String language = entry.getKey();
+            List<Snippet> languageSnippets = entry.getValue();
+
+            System.out.println(ANSI_GREEN + "\n📚 " + ANSI_BOLD + language.toUpperCase() + ANSI_RESET + 
+                             ANSI_GREEN + " (" + languageSnippets.size() + " snippets)" + ANSI_RESET);
+            System.out.println(ANSI_CYAN + "═".repeat(50) + ANSI_RESET);
+
+            for (Snippet snippet : languageSnippets) {
+                System.out.println(ANSI_YELLOW + "\n📝 " + ANSI_BOLD + snippet.getTitle() + ANSI_RESET);
+                System.out.println(ANSI_PURPLE + "   Tags: " + ANSI_RESET + String.join(", ", snippet.getTags()));
+                System.out.println(ANSI_BLUE + "   Created: " + ANSI_RESET + 
+                    snippet.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                System.out.println(ANSI_BLUE + "   Last Updated: " + ANSI_RESET + 
+                    snippet.getLastModified().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                System.out.println(ANSI_CYAN + "   " + "─".repeat(40) + ANSI_RESET);
+            }
+        }
     }
 
     private static void undoLastOperation() {
@@ -460,12 +536,30 @@ public class CodeSnippetOrganizer {
             return;
         }
         
-        System.out.println("\nFound " + snippets.size() + " matching snippet(s):");
-        for (int i = 0; i < snippets.size(); i++) {
-            Snippet snippet = snippets.get(i);
-            System.out.println("\n--- Snippet " + (i + 1) + " ---");
-            System.out.println(snippet);
-            System.out.println("-------------------");
+        // Group snippets by language
+        Map<String, List<Snippet>> snippetsByLanguage = snippets.stream()
+            .collect(Collectors.groupingBy(Snippet::getLanguage));
+        
+        System.out.println(ANSI_GREEN + "\n✨ Found " + snippets.size() + " matching snippet(s):" + ANSI_RESET);
+        
+        // Display snippets grouped by language
+        for (Map.Entry<String, List<Snippet>> entry : snippetsByLanguage.entrySet()) {
+            String language = entry.getKey();
+            List<Snippet> languageSnippets = entry.getValue();
+            
+            System.out.println(ANSI_GREEN + "\n📚 " + ANSI_BOLD + language.toUpperCase() + ANSI_RESET + 
+                             ANSI_GREEN + " (" + languageSnippets.size() + " snippets)" + ANSI_RESET);
+            System.out.println(ANSI_CYAN + "═".repeat(50) + ANSI_RESET);
+            
+            for (Snippet snippet : languageSnippets) {
+                System.out.println(ANSI_YELLOW + "\n📝 " + ANSI_BOLD + snippet.getTitle() + ANSI_RESET);
+                System.out.println(ANSI_PURPLE + "   Tags: " + ANSI_RESET + String.join(", ", snippet.getTags()));
+                System.out.println(ANSI_BLUE + "   Created: " + ANSI_RESET + 
+                    snippet.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                System.out.println(ANSI_BLUE + "   Last Updated: " + ANSI_RESET + 
+                    snippet.getLastModified().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                System.out.println(ANSI_CYAN + "   " + "─".repeat(40) + ANSI_RESET);
+            }
         }
     }
 
