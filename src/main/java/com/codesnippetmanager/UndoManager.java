@@ -1,3 +1,5 @@
+package com.codesnippetmanager;
+
 import java.util.Stack;
 
 public class UndoManager {
