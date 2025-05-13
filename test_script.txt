@@ -1,0 +1,32 @@
+1
+Test Snippet 1
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+END
+Java
+2
+1
+Test Snippet 2
+function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n-1) + fibonacci(n-2);
+}
+END
+JavaScript
+2
+5
+1
+Test
+2
+6
+1
+7
+8
+9
+1
+10
+11
+12 

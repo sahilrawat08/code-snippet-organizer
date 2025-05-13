@@ -1,0 +1,17 @@
+Title: Test Snippet 3
+Language: Python
+Tags: 2
+Created: 2025-05-13T05:31:14.382107700
+Last Modified: 2025-05-13T05:31:14.382107700
+
+Description:
+class Node:
+
+Code:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None

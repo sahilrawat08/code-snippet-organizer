@@ -1,0 +1,40 @@
+1
+Test Snippet 3
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+END
+Python
+2
+3
+1747092895182
+Updated Java Snippet
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Updated Hello, World!");
+    }
+}
+END
+Java
+2
+4
+1747092895286
+2
+5
+2
+Python
+2
+6
+2
+2
+9
+1747092895182
+1
+10
+11
+12 
